@@ -74,7 +74,6 @@ backend/BACKEND_FULL_DOCUMENTATION.md
 # =========================
 # API KEY AI
 # =========================
-AIzaSyBPnNaM2M5BaNcVbp5QZAebiCmkwYt6lIM
 docs\api-flow.md
 docs\architecture.md
 docs\business-domain.md
@@ -98,11 +97,31 @@ node_modules/
 # =========================
 # LOCAL APPLICATION CONFIG
 # =========================
-backend/src/main/resources/application.yml
-backend/src/main/resources/application-local.yml
+/backend/src/main/resources/application.yaml
+/backend/src/main/resources/application.yml
+/backend/src/main/resources/application.properties
+/backend/src/main/resources/application-local.yml
 
 # =========================
 # AI / SECRET FILES
 # =========================
 *.key
 *.secret
+
+
+# =========================
+# CODEX / LOCAL WORKSPACE
+# =========================
+/.codex-local/
+/docs/_scratch/
+AGENTS.md
+README_SETUP.md
+/docs/APPROVAL_PROTOCOL.md
+/docs/CODEX_FIRST_TASK.md
+/docs/EXECUTION_PLAN.md
+/docs/GATES_AND_EVIDENCE.md
+/docs/PROJECT_CONTEXT.md
+/docs/TEAM_WORK.md
+# Local Spring Boot debug configs
+/backend/src/main/resources/application-debug.yml
+/backend/src/main/resources/application-debug.properties
