@@ -3,11 +3,16 @@ package com.englishapp.service.impl;
 import com.englishapp.entity.Feedback;
 import com.englishapp.service.AIService;
 import com.google.genai.Client;
+import com.google.genai.types.ClientOptions;
 import com.google.genai.types.GenerateContentResponse;
+import com.google.genai.types.HttpRetryOptions;
+import com.google.genai.types.HttpOptions;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import okhttp3.OkHttpClient;
 
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +24,23 @@ public class GeminiFlash31LiteServiceImpl implements AIService {
 
     @PostConstruct
     public void init() {
-        client = Client.builder().apiKey(apiKey).build();
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .readTimeout(Duration.ofSeconds(30))
+                .callTimeout(Duration.ofSeconds(35))
+                .retryOnConnectionFailure(false)
+                .build();
+
+        client = Client.builder()
+                .apiKey(apiKey)
+                .clientOptions(ClientOptions.builder()
+                        .customHttpClient(httpClient)
+                        .build())
+                .httpOptions(HttpOptions.builder()
+                        .timeout(30_000)
+                        .retryOptions(HttpRetryOptions.builder().attempts(1).build())
+                        .build())
+                .build();
     }
 
     @Override
