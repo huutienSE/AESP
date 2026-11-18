@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class GeminiEvaluator {
     private static final Logger log = LoggerFactory.getLogger(GeminiEvaluator.class);
     private static final List<String> MODELS =
-            List.of("gemini-3.1-flash-lite", "gemini-2.5-flash-lite");
+            List.of("gemini-3.1-flash-lite", "gemini-3.5-flash-lite");
     private static final Pattern SCORE = Pattern.compile("SCORE:\\s*(\\d+)");
     private static final Pattern FEEDBACK = Pattern.compile("FEEDBACK:\\s*(.*)", Pattern.DOTALL);
 

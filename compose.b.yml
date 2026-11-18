@@ -1,0 +1,66 @@
+name: aesp-b
+services:
+  mysql:
+    image: mysql:8.4.13
+    environment:
+      MYSQL_DATABASE: aesp_database
+      MYSQL_USER: aesp
+      MYSQL_PASSWORD: ${AESP_DB_PASSWORD:?AESP_DB_PASSWORD is required}
+      MYSQL_ROOT_PASSWORD: ${AESP_DB_ROOT_PASSWORD:?AESP_DB_ROOT_PASSWORD is required}
+    ports:
+      - "127.0.0.1:13306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  ai-evaluation-service:
+    build: ./ai-evaluation-service
+    image: aesp-ai-b:local
+    environment:
+      AESP_GEMINI_API_KEY: ${AESP_GEMINI_API_KEY:?AESP_GEMINI_API_KEY is required}
+      AESP_AI_SERVICE_HOST: 0.0.0.0
+      AESP_AI_SERVICE_PORT: "8081"
+    ports:
+      - "127.0.0.1:18081:8081"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8081/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  core:
+    build: ./backend
+    image: aesp-core-b:local
+    environment:
+      SPRING_PROFILES_ACTIVE: split
+      SERVER_PORT: "8080"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/aesp_database?allowPublicKeyRetrieval=true&useSSL=false"
+      SPRING_DATASOURCE_USERNAME: aesp
+      SPRING_DATASOURCE_PASSWORD: ${AESP_DB_PASSWORD:?AESP_DB_PASSWORD is required}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+      JWT_SECRET: ${AESP_JWT_SECRET:?AESP_JWT_SECRET is required}
+      JWT_EXPIRATION: ${AESP_JWT_EXPIRATION:-86400000}
+      AESP_AI_SERVICE_URL: http://ai-evaluation-service:8081
+    ports:
+      - "127.0.0.1:18082:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      ai-evaluation-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8080/api/auth/test >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+volumes:
+  mysql-data:

@@ -1,0 +1,9 @@
+target/
+.env
+.env.*
+**/.env
+**/.env.*
+src/main/resources/*
+!src/main/resources/application.properties
+*.key
+*.secret
