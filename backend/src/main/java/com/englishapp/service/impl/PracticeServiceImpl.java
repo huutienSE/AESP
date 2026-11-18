@@ -12,7 +12,6 @@ import com.englishapp.mapper.PracticeMapper;
 import com.englishapp.mapper.QuestionMapper;
 import com.englishapp.repositoty.*;
 import com.englishapp.service.AIService;
-import com.englishapp.service.GeminiAIService;
 import com.englishapp.service.PracticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,8 +43,6 @@ public class PracticeServiceImpl implements PracticeService {
     private final QuestionMapper questionMapper;
 
     private final FeedbackRepository feedbackRepository;
-
-    private final GeminiAIService geminiAIService;
 
     private final AIService aiService;
 
@@ -186,6 +183,9 @@ public class PracticeServiceImpl implements PracticeService {
 
         Feedback feedback;
 
+        //
+        // ===============================================
+        //
         feedback = aiService.evaluateAnswer(
                 practiceQuestion.getQuestion().getDescription(),
                 request.getAnswer());

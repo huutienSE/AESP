@@ -8,12 +8,14 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Profile("!split")
 public class GeminiAIServiceImpl implements GeminiAIService {
 
     @Value("${gemini.api.key}")

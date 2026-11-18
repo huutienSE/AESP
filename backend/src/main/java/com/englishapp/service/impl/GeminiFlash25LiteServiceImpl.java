@@ -9,6 +9,7 @@ import com.google.genai.types.HttpRetryOptions;
 import com.google.genai.types.HttpOptions;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import okhttp3.OkHttpClient;
 
@@ -17,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Profile("!split")
 public class GeminiFlash25LiteServiceImpl implements AIService {
     @Value("${gemini.api.key}")
     private String apiKey;

@@ -6,12 +6,14 @@ import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Profile("!split")
 public class GeminiFlash25ServiceImpl implements AIService {
     @Value("${gemini.api.key}")
     private String apiKey;

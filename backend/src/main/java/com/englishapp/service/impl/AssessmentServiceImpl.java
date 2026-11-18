@@ -10,6 +10,7 @@ import com.englishapp.entity.enums.Level;
 import com.englishapp.entity.enums.SessionType;
 import com.englishapp.exception.*;
 import com.englishapp.repositoty.*;
+import com.englishapp.service.AIService;
 import com.englishapp.service.AssessmentService;
 import com.englishapp.service.QuestionService;
 import jakarta.transaction.Transactional;
@@ -33,7 +34,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     private final ProfileRepository profileRepository;
 
     private final QuestionService questionService;
-    private final AIRouterServiceImpl aiRouterService;
+    private final AIService aiService;
 
     @Transactional
     @Override
@@ -64,6 +65,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         return new StartAssessmentResponse(savedSession.getSessionId(), questionResponses);
     }
 
+    @Transactional
     @Override
     public PracticeQuestionDetailResponse answerQuestionAssessment(Integer userId, AnswerRequest answerRequest, Integer sessionId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
@@ -82,6 +84,12 @@ public class AssessmentServiceImpl implements AssessmentService {
                 .findById(new PracticeQuestionId(sessionId, answerRequest.getQuestionId()))
                 .orElseThrow(QuestionNotFoundException::new);
 
+        if (practiceAnswerRepository.existsByPracticeQuestion_Id(practiceQuestion.getId())) {
+            throw new QuestionAlreadyAnsweredException();
+        }
+
+        Feedback feedback = aiService.evaluateAnswer(practiceQuestion.getQuestion().getDescription(), answerRequest.getAnswer());
+
         PracticeAnswer practiceAnswer = new PracticeAnswer();
         practiceAnswer.setPracticeQuestion(practiceQuestion);
         practiceAnswer.setUserAnswer(answerRequest.getAnswer());
@@ -89,9 +97,7 @@ public class AssessmentServiceImpl implements AssessmentService {
 
         PracticeAnswer savedAnswer = practiceAnswerRepository.save(practiceAnswer);
 
-        Feedback feedback = aiRouterService.evaluateAnswer(practiceQuestion.getQuestion().getDescription(), answerRequest.getAnswer());
-
-        feedback.setAnswer(practiceAnswer);
+        feedback.setAnswer(savedAnswer);
         feedback.setCreatedDate(LocalDateTime.now());
 
         Feedback savedFeedback = feedbackRepository.save(feedback);
@@ -99,7 +105,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         savedAnswer.setFeedback(savedFeedback);
         practiceAnswerRepository.save(savedAnswer);
 
-        return mapToQuestionDetail(practiceAnswer);
+        return mapToQuestionDetail(savedAnswer);
     }
 
     @Transactional

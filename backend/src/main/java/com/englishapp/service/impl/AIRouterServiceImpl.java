@@ -6,11 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Primary
+@Profile("!split")
 public class AIRouterServiceImpl implements AIService {
     private static final Logger log = LoggerFactory.getLogger(AIRouterServiceImpl.class);
     private final GeminiFlash31LiteServiceImpl geminiFlash31LiteService;
